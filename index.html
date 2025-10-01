@@ -1,0 +1,3828 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Quiz Reviewer - Chapters 5 & 6</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 10px;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        width: 100%;
+      }
+
+      h1 {
+        text-align: center;
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 2em;
+        word-break: break-word;
+      }
+
+      /* Mobile-first responsive design */
+      @media (min-width: 768px) {
+        body {
+          padding: 20px;
+        }
+
+        .container {
+          padding: 40px;
+        }
+
+        h1 {
+          font-size: 2.5em;
+          margin-bottom: 30px;
+        }
+      }
+
+      /* Homepage Styles */
+      .homepage {
+        text-align: center;
+        display: block;
+      }
+
+      .homepage.hidden {
+        display: none;
+      }
+
+      .chapter-selection {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .chapter-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+        width: 100%;
+        max-width: 350px;
+        text-align: center;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .chapter-card:hover,
+      .chapter-card:active {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+
+      .chapter-card h2 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      .chapter-card p {
+        font-size: 1em;
+        line-height: 1.4;
+        margin-bottom: 15px;
+      }
+
+      /* Desktop styles for chapter cards */
+      @media (min-width: 768px) {
+        .chapter-selection {
+          flex-direction: row;
+          gap: 30px;
+          margin-top: 50px;
+        }
+
+        .chapter-card {
+          width: 300px;
+          padding: 30px;
+        }
+
+        .chapter-card h2 {
+          font-size: 1.8em;
+          margin-bottom: 15px;
+        }
+
+        .chapter-card p {
+          font-size: 1.1em;
+          margin-bottom: 20px;
+        }
+
+        .chapter-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+      }
+
+      .chapter-card .question-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        display: inline-block;
+        font-weight: bold;
+      }
+
+      /* Quiz Section Styles */
+      .quiz-section {
+        display: none;
+      }
+
+      .quiz-section.active {
+        display: block;
+      }
+
+      .back-button {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9em;
+        margin-bottom: 15px;
+        transition: background 0.3s;
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .back-button:hover,
+      .back-button:active {
+        background: #5a6268;
+      }
+
+      /* Desktop styles for back button */
+      @media (min-width: 768px) {
+        .back-button {
+          padding: 10px 20px;
+          font-size: 1em;
+          margin-bottom: 20px;
+        }
+      }
+
+      .quiz-item {
+        margin-bottom: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border-left: 5px solid #667eea;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: none;
+      }
+
+      .quiz-item.active {
+        display: block;
+      }
+
+      .quiz-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Desktop styles for quiz items */
+      @media (min-width: 768px) {
+        .quiz-item {
+          margin-bottom: 30px;
+          padding: 25px;
+        }
+
+        .quiz-item:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+
+      .nav-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.3s;
+      }
+
+      .nav-btn:hover {
+        background: #764ba2;
+      }
+
+      .nav-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      .question-counter {
+        font-size: 1.1em;
+        color: #333;
+        font-weight: bold;
+      }
+
+      .question {
+        font-size: 1em;
+        margin-bottom: 15px;
+        color: #333;
+        line-height: 1.5;
+        font-weight: 600;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .option {
+        padding: 12px;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        min-height: 44px; /* Minimum touch target size for mobile */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .option:hover,
+      .option:active {
+        border-color: #667eea;
+        background: #f0f4ff;
+      }
+
+      .option input[type="radio"] {
+        margin-right: 10px;
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+
+      .option label {
+        cursor: pointer;
+        flex: 1;
+        line-height: 1.4;
+        font-size: 0.95em;
+      }
+
+      /* Desktop styles for questions and options */
+      @media (min-width: 768px) {
+        .question {
+          font-size: 1.1em;
+          margin-bottom: 20px;
+          line-height: 1.6;
+        }
+
+        .options {
+          gap: 12px;
+        }
+
+        .option {
+          padding: 15px;
+        }
+
+        .option input[type="radio"] {
+          margin-right: 12px;
+          width: 20px;
+          height: 20px;
+        }
+
+        .option label {
+          line-height: 1.5;
+          font-size: 1em;
+        }
+      }
+
+      .check-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.95em;
+        margin-top: 15px;
+        transition: background 0.3s;
+        min-height: 44px;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        width: 100%;
+        max-width: 200px;
+      }
+
+      .check-btn:hover,
+      .check-btn:active {
+        background: #764ba2;
+      }
+
+      .check-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+
+      /* Desktop styles for buttons */
+      @media (min-width: 768px) {
+        .check-btn {
+          padding: 12px 24px;
+          font-size: 1em;
+          width: auto;
+        }
+      }
+
+      .feedback {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        display: none;
+        line-height: 1.6;
+      }
+
+      .feedback.show {
+        display: block;
+      }
+
+      .feedback.correct {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .feedback.incorrect {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      .correct-answer {
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .option.selected-correct {
+        background: #d4edda;
+        border-color: #28a745;
+      }
+
+      .option.selected-incorrect {
+        background: #f8d7da;
+        border-color: #dc3545;
+      }
+
+      .option.show-correct {
+        background: #d4edda;
+        border-color: #28a745;
+      }
+
+      .progress {
+        text-align: center;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+
+      .progress-text {
+        font-size: 1em;
+        color: #333;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .progress .nav-btn {
+        margin-top: 10px;
+        width: 100%;
+        max-width: 250px;
+      }
+
+      /* Desktop styles for progress */
+      @media (min-width: 768px) {
+        .progress {
+          margin-top: 30px;
+          padding: 20px;
+        }
+
+        .progress-text {
+          font-size: 1.2em;
+        }
+
+        .progress .nav-btn {
+          width: auto;
+          max-width: none;
+        }
+      }
+
+      /* Mobile-specific enhancements */
+      .homepage-description {
+        font-size: 1em !important;
+        margin-bottom: 25px !important;
+        padding: 0 10px;
+        text-align: center;
+      }
+
+      @media (min-width: 768px) {
+        .homepage-description {
+          font-size: 1.2em !important;
+          margin-bottom: 40px !important;
+          padding: 0;
+        }
+      }
+
+      /* Improve tap targets for all interactive elements */
+      button,
+      .chapter-card,
+      .option {
+        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+      }
+
+      /* Ensure text is readable on small screens */
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 1.8em !important;
+        }
+
+        .homepage-description {
+          font-size: 0.95em !important;
+        }
+
+        .chapter-card h2 {
+          font-size: 1.3em !important;
+        }
+
+        .chapter-card p {
+          font-size: 0.9em !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Homepage -->
+      <div class="homepage" id="homepage">
+        <h1>📚 Database Quiz Reviewer</h1>
+        <p class="homepage-description" style="color: #666">
+          Choose a chapter to start your quiz review
+        </p>
+
+        <div class="chapter-selection">
+          <div class="chapter-card" onclick="startChapter(5)">
+            <h2>📊 Chapter 5</h2>
+            <p>Analytic Databases & Database Models</p>
+            <div class="question-count">50 Questions</div>
+          </div>
+
+          <div class="chapter-card" onclick="startChapter(6)">
+            <h2>⚙️ Chapter 6</h2>
+            <p>Data Processing Methods & Systems</p>
+            <div class="question-count">40 Questions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chapter 5 Quiz Section -->
+      <div class="quiz-section" id="chapter5">
+        <button class="back-button" onclick="goHome()">
+          ← Back to Chapters
+        </button>
+        <h1>📊 Chapter 5: Analytic Databases & Models</h1>
+
+        <div class="quiz-item">
+          <div class="question">
+            1. _____________ Are specialized databases optimized for analytics,
+            for example, through data storage (column-based), hardware usage
+            (in-memory), integrated functions (mining), architecture concepts,
+            or delivery terms (appliances)
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q1" id="q1a" value="a" />
+              <label for="q1a">Operational Database</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q1" id="q1b" value="b" />
+              <label for="q1b">Analytic Database</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q1" id="q1c" value="c" />
+              <label for="q1c">Transactional Database</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q1" id="q1d" value="d" />
+              <label for="q1d">Relational Database</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(1, 'b', 'Analytic Database')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            2. Main benefits are _____________, better maintenance, and
+            scalability.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q2" id="q2a" value="a" />
+              <label for="q2a">lower cost</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q2" id="q2b" value="b" />
+              <label for="q2b">faster query performance</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q2" id="q2c" value="c" />
+              <label for="q2c">easier installation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q2" id="q2d" value="d" />
+              <label for="q2d">better security</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(2, 'b', 'faster query performance')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            3. Analytical databases are available as _____________ or as data
+            warehouse appliances.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q3" id="q3a" value="a" />
+              <label for="q3a">hardware</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q3" id="q3b" value="b" />
+              <label for="q3b">software</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q3" id="q3c" value="c" />
+              <label for="q3c">cloud services</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q3" id="q3d" value="d" />
+              <label for="q3d">mobile apps</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(3, 'b', 'software')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            4. Specifically designed to _____________, typically as a part of a
+            data warehouse or data mart.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q4" id="q4a" value="a" />
+              <label for="q4a">process transactions quickly</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q4" id="q4b" value="b" />
+              <label for="q4b">store large files</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q4" id="q4c" value="c" />
+              <label for="q4c"
+                >support business intelligence and analytic applications</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q4" id="q4d" value="d" />
+              <label for="q4d">manage user authentication</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(4, 'c', 'support business intelligence and analytic applications')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            5. This differentiates it from an operational, transactional, or
+            _____________ database, which is used for transaction processing,
+            order entry, and other "run the business" applications
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q5" id="q5a" value="a" />
+              <label for="q5a">OLTP</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q5" id="q5b" value="b" />
+              <label for="q5b">OLAP</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q5" id="q5c" value="c" />
+              <label for="q5c">NoSQL</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q5" id="q5d" value="d" />
+              <label for="q5d">NewSQL</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(5, 'a', 'OLTP')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            6. Stores and manages _____________, including business, market, and
+            customer data for business intelligence (BI) analysis.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q6" id="q6a" value="a" />
+              <label for="q6a">small data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q6" id="q6b" value="b" />
+              <label for="q6b">big data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q6" id="q6c" value="c" />
+              <label for="q6c">metadata</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q6" id="q6d" value="d" />
+              <label for="q6d">unstructured data</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(6, 'b', 'big data')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            7. Designed to quickly analyze massive amounts of data, performing
+            up to _____________ times faster than an operational database for
+            demanding analytical workloads.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q7" id="q7a" value="a" />
+              <label for="q7a">100</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q7" id="q7b" value="b" />
+              <label for="q7b">500</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q7" id="q7c" value="c" />
+              <label for="q7c">1000</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q7" id="q7d" value="d" />
+              <label for="q7d">10000</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(7, 'c', '1000')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            8. The _____________ in an analytical database is compared with
+            operational data.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q8" id="q8a" value="a" />
+              <label for="q8a">real-time data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q8" id="q8b" value="b" />
+              <label for="q8b">historical data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q8" id="q8c" value="c" />
+              <label for="q8c">current data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q8" id="q8d" value="d" />
+              <label for="q8d">backup data</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(8, 'b', 'historical data')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            9. _____________: Historical price and volume data for financial
+            markets for testing trading strategies
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q9" id="q9a" value="a" />
+              <label for="q9a">Market data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q9" id="q9b" value="b" />
+              <label for="q9b">Transactional data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q9" id="q9c" value="c" />
+              <label for="q9c">Process data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q9" id="q9d" value="d" />
+              <label for="q9d">Machine data</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(9, 'a', 'Market data')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            10. _____________: Historical transactions that can include
+            purchasing patterns for improved marketing
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q10" id="q10a" value="a" />
+              <label for="q10a">Market data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q10" id="q10b" value="b" />
+              <label for="q10b">Transactional data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q10" id="q10c" value="c" />
+              <label for="q10c">Natural language data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q10" id="q10d" value="d" />
+              <label for="q10d">Process data</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(10, 'b', 'Transactional data')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            11. _____________: Study of social media posts for research purposes
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q11" id="q11a" value="a" />
+              <label for="q11a">Transactional data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q11" id="q11b" value="b" />
+              <label for="q11b">Natural language data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q11" id="q11c" value="c" />
+              <label for="q11c">Process data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q11" id="q11d" value="d" />
+              <label for="q11d">Machine data</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(11, 'b', 'Natural language data')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            12. _____________: Study of processes to better understand logistics
+            and find bottlenecks
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q11" id="q12a" value="a" />
+              <label for="q12a">Natural language data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q12" id="q12b" value="b" />
+              <label for="q12b">Process data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q12" id="q12c" value="c" />
+              <label for="q12c">Machine data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q12" id="q12d" value="d" />
+              <label for="q12d">Market data</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(12, 'b', 'Process data')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            13. _____________: Software and hardware-generated data from
+            products to improve efficiency
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q13" id="q13a" value="a" />
+              <label for="q13a">Process data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q13" id="q13b" value="b" />
+              <label for="q13b">Machine data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q13" id="q13c" value="c" />
+              <label for="q13c">Transactional data</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q13" id="q13d" value="d" />
+              <label for="q13d">Natural language data</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(13, 'b', 'Machine data')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            14. _____________: A column versus row-based design, which allows
+            for very fast analysis of large sets of data points within a column.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q14" id="q14a" value="a" />
+              <label for="q14a">Columnar data storage</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q14" id="q14b" value="b" />
+              <label for="q14b">Efficient data compression</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q14" id="q14c" value="c" />
+              <label for="q14c">Distributed workloads</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q14" id="q14d" value="d" />
+              <label for="q14d">Parallel processing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(14, 'a', 'Columnar data storage')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            15. The columnar design of analytical databases allows for the most
+            efficient version of _____________, which is how database space and
+            speed are maximized.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q15" id="q15a" value="a" />
+              <label for="q15a">data encryption</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q15" id="q15b" value="b" />
+              <label for="q15b">data compression</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q15" id="q15c" value="c" />
+              <label for="q15c">data replication</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q15" id="q15d" value="d" />
+              <label for="q15d">data partitioning</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(15, 'b', 'data compression')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            16. Data is stored on a cluster of servers, also called
+            _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q16" id="q16a" value="a" />
+              <label for="q16a">clusters</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q16" id="q16b" value="b" />
+              <label for="q16b">nodes</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q16" id="q16c" value="c" />
+              <label for="q16c">hosts</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q16" id="q16d" value="d" />
+              <label for="q16d">instances</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(16, 'b', 'nodes')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            17. _____________: Which organizes data by column instead of rows,
+            thus reducing the number of data elements that typically have to be
+            read by the database while processing queries.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q17" id="q17a" value="a" />
+              <label for="q17a">Columnar databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q17" id="q17b" value="b" />
+              <label for="q17b">In-memory databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q17" id="q17c" value="c" />
+              <label for="q17c">OLAP databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q17" id="q17d" value="d" />
+              <label for="q17d">MPP databases</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(17, 'a', 'Columnar databases')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            18. _____________: Which combines the database with hardware and BI
+            tools is an integrated platform that's tuned for analytical
+            workloads and designed to be easy to install and operate
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q18" id="q18a" value="a" />
+              <label for="q18a">Columnar databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q18" id="q18b" value="b" />
+              <label for="q18b">Data warehouse appliances</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q18" id="q18c" value="c" />
+              <label for="q18c">In-memory databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q18" id="q18d" value="d" />
+              <label for="q18d">OLAP databases</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(18, 'b', 'Data warehouse appliances')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            19. _____________: Which load the source data into system memory in
+            a compressed, non-relational format in an attempt to streamline the
+            work involved in processing queries.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q19" id="q19a" value="a" />
+              <label for="q19a">Data warehouse appliances</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q19" id="q19b" value="b" />
+              <label for="q19b">In-memory databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q19" id="q19c" value="c" />
+              <label for="q19c">MPP databases</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q19" id="q19d" value="d" />
+              <label for="q19d">OLAP databases</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(19, 'b', 'In-memory databases')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            20. Example of In-memory database: _____________
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q20" id="q20a" value="a" />
+              <label for="q20a">Teradata</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q20" id="q20b" value="b" />
+              <label for="q20b">Exasol</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q20" id="q20c" value="c" />
+              <label for="q20c">MongoDB</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q20" id="q20d" value="d" />
+              <label for="q20d">Snowflake</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(20, 'b', 'Exasol')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            21. _____________ databases: Which spreads data across a cluster of
+            servers, enabling the systems to share the query processing workload
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q21" id="q21a" value="a" />
+              <label for="q21a">In-memory</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q21" id="q21b" value="b" />
+              <label for="q21b">Massively Parallel processing (MPP)</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q21" id="q21c" value="c" />
+              <label for="q21c">Columnar</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q21" id="q21d" value="d" />
+              <label for="q21d">OLAP</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(21, 'b', 'Massively Parallel processing (MPP)')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            22. _____________ databases: Which store multidimensional "cubes" of
+            data that can be queried and analyzed from multiple perspectives.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q22" id="q22a" value="a" />
+              <label for="q22a">In-memory</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q22" id="q22b" value="b" />
+              <label for="q22b">MPP</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q22" id="q22c" value="c" />
+              <label for="q22c">OLAP</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q22" id="q22d" value="d" />
+              <label for="q22d">Columnar</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(22, 'c', 'OLAP')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            23. What is the primary advantage of columnar storage in analytical
+            databases?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q23" id="q23a" value="a" />
+              <label for="q23a">Better transaction processing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q23" id="q23b" value="b" />
+              <label for="q23b"
+                >Faster analytical queries on large datasets</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q23" id="q23c" value="c" />
+              <label for="q23c">Improved data security</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q23" id="q23d" value="d" />
+              <label for="q23d">Easier database administration</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(23, 'b', 'Faster analytical queries on large datasets')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            24. Which of the following is NOT a characteristic of analytical
+            databases?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q24" id="q24a" value="a" />
+              <label for="q24a">Optimized for read-heavy workloads</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q24" id="q24b" value="b" />
+              <label for="q24b">Supports complex analytical queries</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q24" id="q24c" value="c" />
+              <label for="q24c"
+                >Optimized for frequent insert/update operations</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q24" id="q24d" value="d" />
+              <label for="q24d">Uses columnar data storage</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(24, 'c', 'Optimized for frequent insert/update operations')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            25. What does MPP stand for in the context of analytical databases?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q25" id="q25a" value="a" />
+              <label for="q25a">Multiple Purpose Processing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q25" id="q25b" value="b" />
+              <label for="q25b">Massively Parallel Processing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q25" id="q25c" value="c" />
+              <label for="q25c">Memory Pooled Processing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q25" id="q25d" value="d" />
+              <label for="q25d">Multi-Platform Processing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(25, 'b', 'Massively Parallel Processing')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            26. Why are Analytical Databases becoming increasingly important in
+            modern business?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q26" id="q26a" value="a" />
+              <label for="q26a"
+                >They are cheaper than traditional databases</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q26" id="q26b" value="b" />
+              <label for="q26b"
+                >Business departments need more agility in data provision,
+                processing, and preparation</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q26" id="q26c" value="c" />
+              <label for="q26c">They require less technical expertise</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q26" id="q26d" value="d" />
+              <label for="q26d">They use less storage space</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(26, 'b', 'Business departments need more agility in data provision, processing, and preparation')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            27. What has put pressure on existing data warehouse architectures?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q27" id="q27a" value="a" />
+              <label for="q27a"
+                >The desire for faster query performance and more complex
+                analysis methods</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q27" id="q27b" value="b" />
+              <label for="q27b">Increased hardware costs</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q27" id="q27c" value="c" />
+              <label for="q27c">Lack of skilled database administrators</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q27" id="q27d" value="d" />
+              <label for="q27d">Government regulations</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(27, 'a', 'The desire for faster query performance and more complex analysis methods')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            28. A central requirement for "big data" usage is the ability to
+            carry out _____________ from structured and polystructured data
+            sources.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q28" id="q28a" value="a" />
+              <label for="q28a">simple queries</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q28" id="q28b" value="b" />
+              <label for="q28b">explorative analyses</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q28" id="q28c" value="c" />
+              <label for="q28c">data backups</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q28" id="q28d" value="d" />
+              <label for="q28d">routine reports</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(28, 'b', 'explorative analyses')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            29. Traditional row-based designs cannot _____________ for a massive
+            amount of data the way columns can.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q29" id="q29a" value="a" />
+              <label for="q29a">compress</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q29" id="q29b" value="b" />
+              <label for="q29b">scale</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q29" id="q29c" value="c" />
+              <label for="q29c">secure</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q29" id="q29d" value="d" />
+              <label for="q29d">backup</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(29, 'b', 'scale')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            30. How many main types of Analytic Databases are typically
+            recognized?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q30" id="q30a" value="a" />
+              <label for="q30a">3</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q30" id="q30b" value="b" />
+              <label for="q30b">4</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q30" id="q30c" value="c" />
+              <label for="q30c">5</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q30" id="q30d" value="d" />
+              <label for="q30d">6</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(30, 'c', '5')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            31. The _____________ model sorts data into tables, also known as
+            relations, each of which consists of columns and rows.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q31" id="q31a" value="a" />
+              <label for="q31a">Hierarchical</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q31" id="q31b" value="b" />
+              <label for="q31b">Relational</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q31" id="q31c" value="c" />
+              <label for="q31c">Network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q31" id="q31d" value="d" />
+              <label for="q31d">Object-oriented</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(31, 'b', 'Relational')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            32. In the relational model, each row is also called a
+            _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q32" id="q32a" value="a" />
+              <label for="q32a">domain</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q32" id="q32b" value="b" />
+              <label for="q32b">attribute</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q32" id="q32c" value="c" />
+              <label for="q32c">tuple</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q32" id="q32d" value="d" />
+              <label for="q32d">relation</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(32, 'c', 'tuple')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            33. The _____________ model organizes data into a tree-like
+            structure, where each record has a single parent or root.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q33" id="q33a" value="a" />
+              <label for="q33a">Hierarchical</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q33" id="q33b" value="b" />
+              <label for="q33b">Network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q33" id="q33c" value="c" />
+              <label for="q33c">Relational</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q33" id="q33d" value="d" />
+              <label for="q33d">Flat</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(33, 'a', 'Hierarchical')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            34. The _____________ model builds on the hierarchical model by
+            allowing many-to-many relationships between linked records.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q34" id="q34a" value="a" />
+              <label for="q34a">Network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q34" id="q34b" value="b" />
+              <label for="q34b">Object-oriented</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q34" id="q34c" value="c" />
+              <label for="q34c">Relational</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q34" id="q34d" value="d" />
+              <label for="q34d">Multidimensional</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(34, 'a', 'Network')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            35. A _____________ database incorporates media, such as images,
+            that could not be stored in a relational database.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q35" id="q35a" value="a" />
+              <label for="q35a">multimedia</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q35" id="q35b" value="b" />
+              <label for="q35b">hypertext</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q35" id="q35c" value="c" />
+              <label for="q35c">object-oriented</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q35" id="q35d" value="d" />
+              <label for="q35d">flat</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(35, 'a', 'multimedia')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            36. A _____________ database allows any object to link to any other
+            object.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q36" id="q36a" value="a" />
+              <label for="q36a">multimedia</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q36" id="q36b" value="b" />
+              <label for="q36b">hypertext</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q36" id="q36c" value="c" />
+              <label for="q36c">network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q36" id="q36d" value="d" />
+              <label for="q36d">hierarchical</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(36, 'b', 'hypertext')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            37. The _____________ model combines the simplicity of the
+            relational model with some of the advanced functionality of the
+            object-oriented database model.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q37" id="q37a" value="a" />
+              <label for="q37a">Object-relational</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q37" id="q37b" value="b" />
+              <label for="q37b">Entity-relationship</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q37" id="q37c" value="c" />
+              <label for="q37c">Multidimensional</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q37" id="q37d" value="d" />
+              <label for="q37d">Context</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(37, 'a', 'Object-relational')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            38. The _____________ model is often used for designing a database
+            conceptually and captures relationships between real-world entities.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q38" id="q38a" value="a" />
+              <label for="q38a">Network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q38" id="q38b" value="b" />
+              <label for="q38b">Entity-relationship</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q38" id="q38c" value="c" />
+              <label for="q38c">Object-oriented</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q38" id="q38d" value="d" />
+              <label for="q38d">Hierarchical</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(38, 'b', 'Entity-relationship')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            39. The _____________ model is designed to facilitate fast full text
+            searches, with data content indexed as a series of keys in a lookup
+            table.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q39" id="q39a" value="a" />
+              <label for="q39a">Inverted file</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q39" id="q39b" value="b" />
+              <label for="q39b">Flat</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q39" id="q39c" value="c" />
+              <label for="q39c">Document</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q39" id="q39d" value="d" />
+              <label for="q39d">Semistructured</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(39, 'a', 'Inverted file')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            40. The _____________ model is the earliest, simplest data model
+            that lists all data in a single table.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q40" id="q40a" value="a" />
+              <label for="q40a">Flat</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q40" id="q40b" value="b" />
+              <label for="q40b">Hierarchical</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q40" id="q40c" value="c" />
+              <label for="q40c">Network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q40" id="q40d" value="d" />
+              <label for="q40d">Relational</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(40, 'a', 'Flat')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            41. The _____________ model is a variation of the relational model
+            designed for online analytical processing (OLAP).
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q41" id="q41a" value="a" />
+              <label for="q41a">Multidimensional</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q41" id="q41b" value="b" />
+              <label for="q41b">Object-oriented</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q41" id="q41c" value="c" />
+              <label for="q41c">Network</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q41" id="q41d" value="d" />
+              <label for="q41d">Semistructured</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(41, 'a', 'Multidimensional')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            42. In the _____________ model, the structural data usually
+            contained in the database schema is embedded with the data itself.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q42" id="q42a" value="a" />
+              <label for="q42a">Context</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q42" id="q42b" value="b" />
+              <label for="q42b">Semistructured</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q42" id="q42c" value="c" />
+              <label for="q42c">Associative</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q42" id="q42d" value="d" />
+              <label for="q42d">Document</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(42, 'b', 'Semistructured')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            43. The _____________ model can incorporate elements from other
+            database models as needed, cobbling together elements from
+            object-oriented, semistructured, and network models.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q43" id="q43a" value="a" />
+              <label for="q43a">Context</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q43" id="q43b" value="b" />
+              <label for="q43b">Associative</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q43" id="q43c" value="c" />
+              <label for="q43c">Multivalue</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q43" id="q43d" value="d" />
+              <label for="q43d">Graph</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(43, 'a', 'Context')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            44. The _____________ model divides all data points based on whether
+            they describe an entity or an association.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q44" id="q44a" value="a" />
+              <label for="q44a">Associative</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q44" id="q44b" value="b" />
+              <label for="q44b">Entity-relationship</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q44" id="q44c" value="c" />
+              <label for="q44c">Context</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q44" id="q44d" value="d" />
+              <label for="q44d">Network</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(44, 'a', 'Associative')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            45. The _____________ database model is even more flexible than a
+            network model, allowing any node to connect with any other.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q45" id="q45a" value="a" />
+              <label for="q45a">Graph</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q45" id="q45b" value="b" />
+              <label for="q45b">Document</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q45" id="q45c" value="c" />
+              <label for="q45c">Multivalue</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q45" id="q45d" value="d" />
+              <label for="q45d">Object-oriented</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(45, 'a', 'Graph')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            46. The _____________ model breaks from the relational model by
+            allowing attributes to contain a list of data rather than a single
+            data point.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q46" id="q46a" value="a" />
+              <label for="q46a">Document</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q46" id="q46b" value="b" />
+              <label for="q46b">Multivalue</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q46" id="q46c" value="c" />
+              <label for="q46c">Graph</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q46" id="q46d" value="d" />
+              <label for="q46d">Associative</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(46, 'b', 'Multivalue')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            47. The _____________ model is designed for storing and managing
+            documents or semi-structured data, rather than atomic data.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q47" id="q47a" value="a" />
+              <label for="q47a">Document</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q47" id="q47b" value="b" />
+              <label for="q47b">Semistructured</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q47" id="q47c" value="c" />
+              <label for="q47c">Multivalue</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q47" id="q47d" value="d" />
+              <label for="q47d">Context</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(47, 'a', 'Document')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            48. Together, the attributes in a relation are called a
+            _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q48" id="q48a" value="a" />
+              <label for="q48a">domain</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q48" id="q48b" value="b" />
+              <label for="q48b">tuple</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q48" id="q48c" value="c" />
+              <label for="q48c">primary key</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q48" id="q48d" value="d" />
+              <label for="q48d">foreign key</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(48, 'a', 'domain')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            49. Which database model is good for describing many real-world
+            relationships and uses a tree-like structure?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q49" id="q49a" value="a" />
+              <label for="q49a">Network model</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q49" id="q49b" value="b" />
+              <label for="q49b">Hierarchical model</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q49" id="q49c" value="c" />
+              <label for="q49c">Flat model</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q49" id="q49d" value="d" />
+              <label for="q49d">Object-oriented model</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(49, 'b', 'Hierarchical model')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            50. The relational model is optimized for _____________, while the
+            multidimensional model is designed for _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q50" id="q50a" value="a" />
+              <label for="q50a">OLAP; OLTP</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q50" id="q50b" value="b" />
+              <label for="q50b">OLTP; OLAP</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q50" id="q50c" value="c" />
+              <label for="q50c">NoSQL; SQL</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q50" id="q50d" value="d" />
+              <label for="q50d">SQL; NoSQL</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(50, 'b', 'OLTP; OLAP')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="navigation" id="chapter5-nav">
+          <button
+            class="nav-btn"
+            id="prev-btn"
+            onclick="previousQuestion()"
+            disabled
+          >
+            Previous
+          </button>
+          <div class="question-counter">
+            Question <span id="current-question">1</span> of
+            <span id="total-questions">50</span>
+          </div>
+          <button class="nav-btn" id="next-btn" onclick="nextQuestion()">
+            Next
+          </button>
+        </div>
+
+        <div class="progress">
+          <div class="progress-text">
+            Progress: <span id="progress-counter">0/50</span> questions answered
+          </div>
+          <button
+            class="nav-btn"
+            id="shuffle-btn"
+            onclick="shuffleQuestions()"
+            style="margin-top: 15px"
+          >
+            🔀 Shuffle Questions
+          </button>
+        </div>
+      </div>
+
+      <!-- Chapter 6 Quiz Section -->
+      <div class="quiz-section" id="chapter6">
+        <button class="back-button" onclick="goHome()">
+          ← Back to Chapters
+        </button>
+        <h1>⚙️ Chapter 6: Data Processing</h1>
+
+        <div class="quiz-item">
+          <div class="question">
+            51. Data processing is a series of actions performed on data to
+            _____________, organize, transform, and extract data in an
+            appropriate output form.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q51" id="q51a" value="a" />
+              <label for="q51a">verify</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q51" id="q51b" value="b" />
+              <label for="q51b">analyze</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q51" id="q51c" value="c" />
+              <label for="q51c">interpret</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q51" id="q51d" value="d" />
+              <label for="q51d">store</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(51, 'a', 'verify')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            52. The essence of data processing is _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q52" id="q52a" value="a" />
+              <label for="q52a">data expansion</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q52" id="q52b" value="b" />
+              <label for="q52b">data reduction</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q52" id="q52c" value="c" />
+              <label for="q52c">data duplication</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q52" id="q52d" value="d" />
+              <label for="q52d">data encryption</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(52, 'b', 'data reduction')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            53. _____________ is characterized by the need to establish, retain,
+            and process files of data for producing useful information.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q53" id="q53a" value="a" />
+              <label for="q53a">Business Data Processing (BDP)</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q53" id="q53b" value="b" />
+              <label for="q53b">Scientific Data Processing (SDP)</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q53" id="q53c" value="c" />
+              <label for="q53c">Real-time Processing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q53" id="q53d" value="d" />
+              <label for="q53d">Batch Processing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(53, 'a', 'Business Data Processing (BDP)')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            54. _____________ involves a limited volume of input and many
+            logical or arithmetic calculations.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q54" id="q54a" value="a" />
+              <label for="q54a">Business Data Processing (BDP)</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q54" id="q54b" value="b" />
+              <label for="q54b">Scientific Data Processing (SDP)</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q54" id="q54c" value="c" />
+              <label for="q54c">Batch Processing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q54" id="q54d" value="d" />
+              <label for="q54d">Online Processing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(54, 'b', 'Scientific Data Processing (SDP)')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            55. The first step in data processing is _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q55" id="q55a" value="a" />
+              <label for="q55a">Coding</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q55" id="q55b" value="b" />
+              <label for="q55b">Editing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q55" id="q55c" value="c" />
+              <label for="q55c">Classification</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q55" id="q55d" value="d" />
+              <label for="q55d">Tabulation</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(55, 'b', 'Editing')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            56. _____________ editing is done by the enumerator soon after the
+            enumeration or interview.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q56" id="q56a" value="a" />
+              <label for="q56a">Central</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q56" id="q56b" value="b" />
+              <label for="q56b">Field</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q56" id="q56c" value="c" />
+              <label for="q56c">Quality</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q56" id="q56d" value="d" />
+              <label for="q56d">Tabulation</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(56, 'b', 'Field')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            57. _____________ editing is done by the researcher after getting
+            all schedules or questionnaires from the enumerators.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q57" id="q57a" value="a" />
+              <label for="q57a">Field</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q57" id="q57b" value="b" />
+              <label for="q57b">Central</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q57" id="q57c" value="c" />
+              <label for="q57c">Quality</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q57" id="q57d" value="d" />
+              <label for="q57d">Tabulation</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(57, 'b', 'Central')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            58. _____________ is the process by which data or responses are
+            organized into classes or categories and symbols are given to each
+            item.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q58" id="q58a" value="a" />
+              <label for="q58a">Editing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q58" id="q58b" value="b" />
+              <label for="q58b">Coding</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q58" id="q58c" value="c" />
+              <label for="q58c">Classification</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q58" id="q58d" value="d" />
+              <label for="q58d">Tabulation</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(58, 'b', 'Coding')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            59. A _____________ is an outline of what is coded and how it is to
+            be coded.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q59" id="q59a" value="a" />
+              <label for="q59a">coding frame</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q59" id="q59b" value="b" />
+              <label for="q59b">transcription sheet</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q59" id="q59c" value="c" />
+              <label for="q59c">classification table</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q59" id="q59d" value="d" />
+              <label for="q59d">statistical series</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(59, 'a', 'coding frame')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            60. _____________ is the process of summarizing raw data and
+            displaying it in compact form for further analysis.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q60" id="q60a" value="a" />
+              <label for="q60a">Coding</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q60" id="q60b" value="b" />
+              <label for="q60b">Classification</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q60" id="q60c" value="c" />
+              <label for="q60c">Tabulation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q60" id="q60d" value="d" />
+              <label for="q60d">Editing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(60, 'c', 'Tabulation')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            61. Classification can be _____________ classification (based on
+            variables) or _____________ classification (based on attributes).
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q61" id="q61a" value="a" />
+              <label for="q61a">quantitative; qualitative</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q61" id="q61b" value="b" />
+              <label for="q61b">qualitative; quantitative</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q61" id="q61c" value="c" />
+              <label for="q61c">multiple; dichotomous</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q61" id="q61d" value="d" />
+              <label for="q61d">inclusive; exclusive</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(61, 'a', 'quantitative; qualitative')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            62. _____________ are charts and graphs used to present data and
+            facilitate getting the attention of the reader.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q62" id="q62a" value="a" />
+              <label for="q62a">Data diagrams</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q62" id="q62b" value="b" />
+              <label for="q62b">Statistical series</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q62" id="q62c" value="c" />
+              <label for="q62c">Transcription sheets</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q62" id="q62d" value="d" />
+              <label for="q62d">Coding frames</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(62, 'a', 'Data diagrams')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            63. The Data Processing Cycle consists of _____________ stages.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q63" id="q63a" value="a" />
+              <label for="q63a">5</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q63" id="q63b" value="b" />
+              <label for="q63b">6</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q63" id="q63c" value="c" />
+              <label for="q63c">7</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q63" id="q63d" value="d" />
+              <label for="q63d">8</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(63, 'b', '6')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            64. _____________ processing is a technique in which data is
+            collected into groups for convenient and efficient processing.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q64" id="q64a" value="a" />
+              <label for="q64a">Batch</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q64" id="q64b" value="b" />
+              <label for="q64b">Online</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q64" id="q64c" value="c" />
+              <label for="q64c">Real-time</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q64" id="q64d" value="d" />
+              <label for="q64d">Distributed</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(64, 'a', 'Batch')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            65. _____________ processing refers to equipment or devices under
+            the direct control of the CPU.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q65" id="q65a" value="a" />
+              <label for="q65a">Batch</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q65" id="q65b" value="b" />
+              <label for="q65b">Online</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q65" id="q65c" value="c" />
+              <label for="q65c">Distributed</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q65" id="q65d" value="d" />
+              <label for="q65d">Multi</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(65, 'b', 'Online')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            66. _____________ processing has the capability of fast-response to
+            obtain data and return a response rapidly enough to affect the
+            outcome of the activity.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q66" id="q66a" value="a" />
+              <label for="q66a">Batch</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q66" id="q66b" value="b" />
+              <label for="q66b">Online</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q66" id="q66c" value="c" />
+              <label for="q66c">Real-time</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q66" id="q66d" value="d" />
+              <label for="q66d">Distributed</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(66, 'c', 'Real-time')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            67. Airline reservation systems require _____________ processing.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q67" id="q67a" value="a" />
+              <label for="q67a">batch</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q67" id="q67b" value="b" />
+              <label for="q67b">distributed</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q67" id="q67c" value="c" />
+              <label for="q67c">real-time</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q67" id="q67d" value="d" />
+              <label for="q67d">multi</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(67, 'c', 'real-time')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            68. _____________ processing consists of remote terminals linked to
+            a large central computer system.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q68" id="q68a" value="a" />
+              <label for="q68a">Multi</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q68" id="q68b" value="b" />
+              <label for="q68b">Distributed</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q68" id="q68c" value="c" />
+              <label for="q68c">Time sharing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q68" id="q68d" value="d" />
+              <label for="q68d">Real-time</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(68, 'b', 'Distributed')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            69. _____________ processing makes use of more than one CPU working
+            simultaneously.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q69" id="q69a" value="a" />
+              <label for="q69a">Multi</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q69" id="q69b" value="b" />
+              <label for="q69b">Distributed</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q69" id="q69c" value="c" />
+              <label for="q69c">Time sharing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q69" id="q69d" value="d" />
+              <label for="q69d">Online</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(69, 'a', 'Multi')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            70. _____________ processing involves time-based use of CPU where a
+            single CPU is used by multiple users.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q70" id="q70a" value="a" />
+              <label for="q70a">Multi</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q70" id="q70b" value="b" />
+              <label for="q70b">Distributed</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q70" id="q70c" value="c" />
+              <label for="q70c">Time sharing</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q70" id="q70d" value="d" />
+              <label for="q70d">Batch</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(70, 'c', 'Time sharing')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            71. Which stage of the Data Processing Cycle involves gathering raw
+            data from various sources?
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q71" id="q71a" value="a" />
+              <label for="q71a">Collection</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q71" id="q71b" value="b" />
+              <label for="q71b">Preparation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q71" id="q71c" value="c" />
+              <label for="q71c">Input</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q71" id="q71d" value="d" />
+              <label for="q71d">Processing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(71, 'a', 'Collection')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            72. _____________ involves ensuring that supplied data is "clean,
+            correct and useful."
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q72" id="q72a" value="a" />
+              <label for="q72a">Conversion</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q72" id="q72b" value="b" />
+              <label for="q72b">Validation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q72" id="q72c" value="c" />
+              <label for="q72c">Sorting</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q72" id="q72d" value="d" />
+              <label for="q72d">Aggregation</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(72, 'b', 'Validation')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            73. _____________ involves "arranging items in some sequence and/or
+            in different sets."
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q73" id="q73a" value="a" />
+              <label for="q73a">Validation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q73" id="q73b" value="b" />
+              <label for="q73b">Sorting</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q73" id="q73c" value="c" />
+              <label for="q73c">Summarization</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q73" id="q73d" value="d" />
+              <label for="q73d">Analysis</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(73, 'b', 'Sorting')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            74. _____________ involves reducing detail data to its main points.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q74" id="q74a" value="a" />
+              <label for="q74a">Aggregation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q74" id="q74b" value="b" />
+              <label for="q74b">Summarization</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q74" id="q74c" value="c" />
+              <label for="q74c">Analysis</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q74" id="q74d" value="d" />
+              <label for="q74d">Reporting</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(74, 'b', 'Summarization')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            75. _____________ involves combining multiple pieces of data.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q75" id="q75a" value="a" />
+              <label for="q75a">Aggregation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q75" id="q75b" value="b" />
+              <label for="q75b">Summarization</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q75" id="q75c" value="c" />
+              <label for="q75c">Validation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q75" id="q75d" value="d" />
+              <label for="q75d">Conversion</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(75, 'a', 'Aggregation')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            76. Business Data Processing generally involves a _____________
+            volume of input data and _____________ arithmetical operations.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q76" id="q76a" value="a" />
+              <label for="q76a">large; limited</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q76" id="q76b" value="b" />
+              <label for="q76b">limited; many</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q76" id="q76c" value="c" />
+              <label for="q76c">small; complex</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q76" id="q76d" value="d" />
+              <label for="q76d">large; many</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(76, 'a', 'large; limited')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            77. Scientific Data Processing problems are mostly _____________
+            requiring a "one-time" solution.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q77" id="q77a" value="a" />
+              <label for="q77a">repetitive</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q77" id="q77b" value="b" />
+              <label for="q77b">non-repetitive</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q77" id="q77c" value="c" />
+              <label for="q77c">cyclical</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q77" id="q77d" value="d" />
+              <label for="q77d">routine</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(77, 'b', 'non-repetitive')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            78. _____________ classification makes two groups based on the
+            presence or absence of a certain quality.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q78" id="q78a" value="a" />
+              <label for="q78a">Multiple</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q78" id="q78b" value="b" />
+              <label for="q78b">Dichotomous</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q78" id="q78c" value="c" />
+              <label for="q78c">Quantitative</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q78" id="q78d" value="d" />
+              <label for="q78d">Qualitative</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(78, 'b', 'Dichotomous')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            79. _____________ classification is the way of making many (more
+            than two) groups based on some quality or attributes.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q79" id="q79a" value="a" />
+              <label for="q79a">Multiple</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q79" id="q79b" value="b" />
+              <label for="q79b">Dichotomous</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q79" id="q79c" value="c" />
+              <label for="q79c">Binary</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q79" id="q79d" value="d" />
+              <label for="q79d">Simple</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(79, 'a', 'Multiple')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            80. A limitation of batch processing is that it requires
+            _____________ prior to processing.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q80" id="q80a" value="a" />
+              <label for="q80a">sorting</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q80" id="q80b" value="b" />
+              <label for="q80b">validation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q80" id="q80c" value="c" />
+              <label for="q80c">encryption</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q80" id="q80d" value="d" />
+              <label for="q80d">compression</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(80, 'a', 'sorting')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            81. Batch processing is most appropriate for applications like
+            _____________ where delay does not reduce information value.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q81" id="q81a" value="a" />
+              <label for="q81a">airline reservations</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q81" id="q81b" value="b" />
+              <label for="q81b">payroll</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q81" id="q81c" value="c" />
+              <label for="q81c">banking transactions</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q81" id="q81d" value="d" />
+              <label for="q81d">stock trading</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(81, 'b', 'payroll')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            82. Time sharing processing is also referred to as _____________
+            system.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q82" id="q82a" value="a" />
+              <label for="q82a">multi access</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q82" id="q82b" value="b" />
+              <label for="q82b">single user</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q82" id="q82c" value="c" />
+              <label for="q82c">dedicated</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q82" id="q82d" value="d" />
+              <label for="q82d">standalone</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(82, 'a', 'multi access')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            83. In multi processing, if one CPU fails, the other CPUs
+            _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q83" id="q83a" value="a" />
+              <label for="q83a">also fail</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q83" id="q83b" value="b" />
+              <label for="q83b">continue to work</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q83" id="q83c" value="c" />
+              <label for="q83c">restart automatically</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q83" id="q83d" value="d" />
+              <label for="q83d">slow down significantly</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(83, 'b', 'continue to work')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            84. _____________ editing asks questions like "Are the data forms
+            complete?" and "Are the recordings free of errors?"
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q84" id="q84a" value="a" />
+              <label for="q84a">Field</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q84" id="q84b" value="b" />
+              <label for="q84b">Central</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q84" id="q84c" value="c" />
+              <label for="q84c">Quality</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q84" id="q84d" value="d" />
+              <label for="q84d">Tabulation</label>
+            </div>
+          </div>
+          <button class="check-btn" onclick="checkAnswer(84, 'c', 'Quality')">
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            85. _____________ editing does certain accepted modifications to
+            data to facilitate tabulation.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q85" id="q85a" value="a" />
+              <label for="q85a">Quality</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q85" id="q85b" value="b" />
+              <label for="q85b">Tabulation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q85" id="q85c" value="c" />
+              <label for="q85c">Field</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q85" id="q85d" value="d" />
+              <label for="q85d">Central</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(85, 'b', 'Tabulation')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            86. Transferring information from schedules to a separate sheet is
+            called _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q86" id="q86a" value="a" />
+              <label for="q86a">coding</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q86" id="q86b" value="b" />
+              <label for="q86b">transcription</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q86" id="q86c" value="c" />
+              <label for="q86c">classification</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q86" id="q86d" value="d" />
+              <label for="q86d">tabulation</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(86, 'b', 'transcription')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            87. Data diagrams are classified into _____________ and
+            _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q87" id="q87a" value="a" />
+              <label for="q87a">charts; graphs</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q87" id="q87b" value="b" />
+              <label for="q87b">tables; figures</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q87" id="q87c" value="c" />
+              <label for="q87c">images; text</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q87" id="q87d" value="d" />
+              <label for="q87d">static; dynamic</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(87, 'a', 'charts; graphs')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            88. Bar charts are _____________, while rectangles, squares and
+            circles are _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q88" id="q88a" value="a" />
+              <label for="q88a">two-dimensional; uni-dimensional</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q88" id="q88b" value="b" />
+              <label for="q88b">uni-dimensional; two-dimensional</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q88" id="q88c" value="c" />
+              <label for="q88c">static; dynamic</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q88" id="q88d" value="d" />
+              <label for="q88d">simple; complex</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(88, 'b', 'uni-dimensional; two-dimensional')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            89. Graphs may be divided into _____________ and _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q89" id="q89a" value="a" />
+              <label for="q89a">simple; complex</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q89" id="q89b" value="b" />
+              <label for="q89b"
+                >Graphs of Time Series; Graphs of Frequency Distribution</label
+              >
+            </div>
+            <div class="option">
+              <input type="radio" name="q89" id="q89c" value="c" />
+              <label for="q89c">linear; curved</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q89" id="q89d" value="d" />
+              <label for="q89d">horizontal; vertical</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(89, 'b', 'Graphs of Time Series; Graphs of Frequency Distribution')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-item">
+          <div class="question">
+            90. The Data Processing Cycle provides a view on how data travels
+            and transforms from _____________ to _____________.
+          </div>
+          <div class="options">
+            <div class="option">
+              <input type="radio" name="q90" id="q90a" value="a" />
+              <label for="q90a">input; output</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q90" id="q90b" value="b" />
+              <label for="q90b">collection; interpretation</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q90" id="q90c" value="c" />
+              <label for="q90c">raw data; information</label>
+            </div>
+            <div class="option">
+              <input type="radio" name="q90" id="q90d" value="d" />
+              <label for="q90d">storage; processing</label>
+            </div>
+          </div>
+          <button
+            class="check-btn"
+            onclick="checkAnswer(90, 'b', 'collection; interpretation')"
+          >
+            Check Answer
+          </button>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="navigation" id="chapter6-nav">
+          <button
+            class="nav-btn"
+            id="prev-btn-6"
+            onclick="previousQuestion()"
+            disabled
+          >
+            Previous
+          </button>
+          <div class="question-counter">
+            Question <span id="current-question-6">1</span> of
+            <span id="total-questions-6">40</span>
+          </div>
+          <button class="nav-btn" id="next-btn-6" onclick="nextQuestion()">
+            Next
+          </button>
+        </div>
+
+        <div class="progress">
+          <div class="progress-text">
+            Progress: <span id="progress-counter-6">0/40</span> questions
+            answered
+          </div>
+          <button
+            class="nav-btn"
+            id="shuffle-btn-6"
+            onclick="shuffleQuestions()"
+            style="margin-top: 15px"
+          >
+            🔀 Shuffle Questions
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let currentChapter = null;
+      let answeredQuestions = new Set();
+      let currentQuestionIndex = 1;
+      let totalQuestions = 0;
+      let questionOrder = [];
+      let isShuffled = false;
+
+      // Chapter configurations
+      const chapterConfig = {
+        5: {
+          totalQuestions: 50,
+          startQuestion: 1,
+          endQuestion: 50,
+          title: "Chapter 5: Analytic Databases & Models",
+        },
+        6: {
+          totalQuestions: 40,
+          startQuestion: 51,
+          endQuestion: 90,
+          title: "Chapter 6: Data Processing",
+        },
+      };
+
+      // Navigation functions
+      function startChapter(chapterNum) {
+        currentChapter = chapterNum;
+        const config = chapterConfig[chapterNum];
+        totalQuestions = config.totalQuestions;
+        questionOrder = Array.from(
+          { length: totalQuestions },
+          (_, i) => config.startQuestion + i
+        );
+
+        // Reset state
+        answeredQuestions.clear();
+        currentQuestionIndex = 1;
+        isShuffled = false;
+
+        // Hide homepage and show chapter
+        document.getElementById("homepage").classList.add("hidden");
+        document.getElementById(`chapter${chapterNum}`).classList.add("active");
+
+        // Update UI elements for the chapter
+        updateChapterUI();
+        showQuestion(1);
+      }
+
+      function goHome() {
+        // Hide all quiz sections
+        document.querySelectorAll(".quiz-section").forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        // Show homepage
+        document.getElementById("homepage").classList.remove("hidden");
+
+        // Reset variables
+        currentChapter = null;
+        answeredQuestions.clear();
+        currentQuestionIndex = 1;
+      }
+
+      function updateChapterUI() {
+        const config = chapterConfig[currentChapter];
+        const suffix = currentChapter === 5 ? "" : `-${currentChapter}`;
+
+        // Update question counter
+        document.getElementById(`current-question${suffix}`).textContent =
+          currentQuestionIndex;
+        document.getElementById(`total-questions${suffix}`).textContent =
+          totalQuestions;
+
+        // Update progress
+        document.getElementById(
+          `progress-counter${suffix}`
+        ).textContent = `0/${totalQuestions}`;
+
+        // Reset shuffle button
+        const shuffleBtn = document.getElementById(`shuffle-btn${suffix}`);
+        if (shuffleBtn) {
+          shuffleBtn.textContent = "🔀 Shuffle Questions";
+        }
+      }
+
+      function showQuestion(questionNum) {
+        if (!currentChapter) return;
+
+        // Hide all questions in current chapter
+        const chapterSection = document.getElementById(
+          `chapter${currentChapter}`
+        );
+        chapterSection.querySelectorAll(".quiz-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        // Show current question based on order
+        const actualQuestionNum = questionOrder[questionNum - 1];
+        const questionIndex =
+          actualQuestionNum - chapterConfig[currentChapter].startQuestion + 1;
+        const currentQuestion = chapterSection.querySelector(
+          `.quiz-item:nth-child(${questionIndex + 1})`
+        );
+
+        if (currentQuestion) {
+          currentQuestion.classList.add("active");
+        }
+
+        // Update question counter
+        const suffix = currentChapter === 5 ? "" : `-${currentChapter}`;
+        document.getElementById(`current-question${suffix}`).textContent =
+          questionNum;
+
+        // Update navigation buttons
+        const prevBtn = document.getElementById(`prev-btn${suffix}`);
+        const nextBtn = document.getElementById(`next-btn${suffix}`);
+
+        prevBtn.disabled = questionNum === 1;
+
+        // Disable next button unless question is answered
+        const isAnswered = answeredQuestions.has(actualQuestionNum);
+        nextBtn.disabled = !isAnswered && questionNum < totalQuestions;
+
+        if (questionNum === totalQuestions) {
+          nextBtn.textContent = "Finish";
+          nextBtn.disabled = !isAnswered;
+        } else {
+          nextBtn.textContent = "Next";
+        }
+      }
+
+      function previousQuestion() {
+        if (currentQuestionIndex > 1) {
+          currentQuestionIndex--;
+          showQuestion(currentQuestionIndex);
+        }
+      }
+
+      function nextQuestion() {
+        if (currentQuestionIndex < totalQuestions) {
+          currentQuestionIndex++;
+          showQuestion(currentQuestionIndex);
+        } else {
+          // Show final results
+          showResults();
+        }
+      }
+
+      function showResults() {
+        const correctCount = Array.from(answeredQuestions).filter((q) => {
+          const selectedOption = document.querySelector(
+            `input[name="q${q}"]:checked`
+          );
+          const correctAnswer = getCorrectAnswer(q);
+          return selectedOption && selectedOption.value === correctAnswer;
+        }).length;
+
+        alert(
+          `🎉 Quiz Complete!\n\nYou answered ${correctCount} out of ${
+            answeredQuestions.size
+          } questions correctly.\nAccuracy: ${
+            answeredQuestions.size > 0
+              ? Math.round((correctCount / answeredQuestions.size) * 100)
+              : 0
+          }%`
+        );
+      }
+
+      function shuffleQuestions() {
+        if (answeredQuestions.size > 0) {
+          if (
+            !confirm(
+              "Shuffling will reset your progress. Are you sure you want to continue?"
+            )
+          ) {
+            return;
+          }
+          // Reset progress
+          answeredQuestions.clear();
+          updateProgress();
+          // Re-enable all buttons and clear feedback
+          document
+            .querySelectorAll(".check-btn")
+            .forEach((btn) => (btn.disabled = false));
+          document.querySelectorAll('input[type="radio"]').forEach((input) => {
+            input.disabled = false;
+            input.checked = false;
+          });
+          document.querySelectorAll(".feedback").forEach((feedback) => {
+            feedback.classList.remove("show");
+          });
+          document.querySelectorAll(".option").forEach((option) => {
+            option.classList.remove(
+              "selected-correct",
+              "selected-incorrect",
+              "show-correct"
+            );
+          });
+        }
+
+        // Shuffle the question order
+        for (let i = questionOrder.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questionOrder[i], questionOrder[j]] = [
+            questionOrder[j],
+            questionOrder[i],
+          ];
+        }
+
+        isShuffled = true;
+        currentQuestionIndex = 1;
+        showQuestion(1);
+
+        // Update shuffle button text
+        document.getElementById("shuffle-btn").textContent = "🔀 Shuffle Again";
+      }
+
+      function getCorrectAnswer(questionNum) {
+        const correctAnswers = {
+          1: "b",
+          2: "b",
+          3: "b",
+          4: "c",
+          5: "a",
+          6: "b",
+          7: "c",
+          8: "b",
+          9: "a",
+          10: "b",
+          11: "b",
+          12: "b",
+          13: "b",
+          14: "a",
+          15: "b",
+          16: "b",
+          17: "a",
+          18: "b",
+          19: "b",
+          20: "b",
+          21: "b",
+          22: "c",
+          23: "b",
+          24: "c",
+          25: "b",
+          26: "b",
+          27: "a",
+          28: "b",
+          29: "b",
+          30: "c",
+          31: "b",
+          32: "c",
+          33: "a",
+          34: "a",
+          35: "a",
+          36: "b",
+          37: "a",
+          38: "b",
+          39: "a",
+          40: "a",
+          41: "a",
+          42: "b",
+          43: "a",
+          44: "a",
+          45: "a",
+          46: "b",
+          47: "a",
+          48: "a",
+          49: "b",
+          50: "b",
+          51: "a",
+          52: "b",
+          53: "a",
+          54: "b",
+          55: "b",
+          56: "b",
+          57: "b",
+          58: "b",
+          59: "a",
+          60: "c",
+          61: "a",
+          62: "a",
+          63: "b",
+          64: "a",
+          65: "b",
+          66: "c",
+          67: "c",
+          68: "b",
+          69: "a",
+          70: "c",
+          71: "a",
+          72: "b",
+          73: "b",
+          74: "b",
+          75: "a",
+          76: "a",
+          77: "b",
+          78: "b",
+          79: "a",
+          80: "a",
+          81: "b",
+          82: "a",
+          83: "b",
+          84: "c",
+          85: "b",
+          86: "b",
+          87: "a",
+          88: "b",
+          89: "b",
+          90: "b",
+        };
+        return correctAnswers[questionNum];
+      }
+
+      function checkAnswer(questionNum, correctAnswer, correctText) {
+        const selectedOption = document.querySelector(
+          `input[name="q${questionNum}"]:checked`
+        );
+        const feedback = document.querySelector(
+          `.quiz-item:nth-child(${questionNum + 1}) .feedback`
+        );
+        const button = document.querySelector(
+          `.quiz-item:nth-child(${questionNum + 1}) .check-btn`
+        );
+        const options = document.querySelectorAll(
+          `.quiz-item:nth-child(${questionNum + 1}) .option`
+        );
+
+        if (!selectedOption) {
+          alert("Please select an answer before checking!");
+          return;
+        }
+
+        // Disable the button and all radio buttons for this question
+        button.disabled = true;
+        document
+          .querySelectorAll(`input[name="q${questionNum}"]`)
+          .forEach((input) => {
+            input.disabled = true;
+          });
+
+        // Remove previous styling
+        options.forEach((option) => {
+          option.classList.remove(
+            "selected-correct",
+            "selected-incorrect",
+            "show-correct"
+          );
+        });
+
+        const selectedValue = selectedOption.value;
+        const selectedOption_div = selectedOption.closest(".option");
+
+        if (selectedValue === correctAnswer) {
+          // Correct answer
+          selectedOption_div.classList.add("selected-correct");
+          feedback.className = "feedback correct show";
+          feedback.innerHTML = `✅ <strong>Correct!</strong> The answer is <span class="correct-answer">${correctText}</span>.`;
+        } else {
+          // Incorrect answer
+          selectedOption_div.classList.add("selected-incorrect");
+
+          // Show the correct answer
+          const correctOption = document
+            .querySelector(
+              `input[name="q${questionNum}"][value="${correctAnswer}"]`
+            )
+            .closest(".option");
+          correctOption.classList.add("show-correct");
+
+          feedback.className = "feedback incorrect show";
+          feedback.innerHTML = `❌ <strong>Incorrect.</strong> The correct answer is <span class="correct-answer">${correctText}</span>.`;
+        }
+
+        // Update progress
+        if (!answeredQuestions.has(questionNum)) {
+          answeredQuestions.add(questionNum);
+          updateProgress();
+        }
+
+        // Enable next button after answering
+        if (currentChapter) {
+          const suffix = currentChapter === 5 ? "" : `-${currentChapter}`;
+          const nextBtn = document.getElementById(`next-btn${suffix}`);
+          if (nextBtn) nextBtn.disabled = false;
+        }
+      }
+
+      function updateProgress() {
+        if (!currentChapter) return;
+
+        const suffix = currentChapter === 5 ? "" : `-${currentChapter}`;
+        const progressCounter = document.getElementById(
+          `progress-counter${suffix}`
+        );
+
+        // Count answered questions for current chapter only
+        const config = chapterConfig[currentChapter];
+        const chapterAnswered = Array.from(answeredQuestions).filter(
+          (q) => q >= config.startQuestion && q <= config.endQuestion
+        ).length;
+
+        progressCounter.textContent = `${chapterAnswered}/${totalQuestions}`;
+
+        if (chapterAnswered === totalQuestions) {
+          setTimeout(() => {
+            alert(
+              `🎉 Congratulations! You have completed all ${config.title} questions!`
+            );
+          }, 500);
+        }
+      }
+
+      // Initialize quiz on page load
+      document.addEventListener("DOMContentLoaded", function () {
+        // Show homepage by default
+        document.getElementById("homepage").classList.remove("hidden");
+
+        // Add hover effects for better interactivity
+        const options = document.querySelectorAll(".option");
+
+        options.forEach((option) => {
+          option.addEventListener("click", function () {
+            const radio = this.querySelector('input[type="radio"]');
+            if (!radio.disabled) {
+              radio.checked = true;
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
