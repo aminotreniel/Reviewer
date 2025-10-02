@@ -2363,7 +2363,10 @@
               <label for="q58d">Tabulation</label>
             </div>
           </div>
-          <button class="check-btn" onclick="checkAnswer(58, 'b', 'Coding')">
+          <button
+            class="check-btn"
+            onclick="checkAnswer(58, 'c', 'Classification')"
+          >
             Check Answer
           </button>
           <div class="feedback"></div>
@@ -3482,12 +3485,28 @@
       function showQuestion(questionNum) {
         if (!currentChapter) return;
 
-        // Hide all questions in current chapter
+        // Hide all questions in current chapter and clear their state
         const chapterSection = document.getElementById(
           `chapter${currentChapter}`
         );
         chapterSection.querySelectorAll(".quiz-item").forEach((item) => {
           item.classList.remove("active");
+
+          // Clear feedback for all questions
+          const feedback = item.querySelector(".feedback");
+          if (feedback) {
+            feedback.classList.remove("show", "correct", "incorrect");
+          }
+
+          // Clear option styling for all questions
+          const options = item.querySelectorAll(".option");
+          options.forEach((option) => {
+            option.classList.remove(
+              "selected-correct",
+              "selected-incorrect",
+              "show-correct"
+            );
+          });
         });
 
         // Show current question based on order
@@ -3500,6 +3519,48 @@
 
         if (currentQuestion) {
           currentQuestion.classList.add("active");
+
+          // Restore the correct state for the current question if it was already answered
+          const isAnswered = answeredQuestions.has(actualQuestionNum);
+          if (isAnswered) {
+            // Re-apply the styling and feedback for this answered question
+            const selectedOption = currentQuestion.querySelector(
+              `input[name="q${actualQuestionNum}"]:checked`
+            );
+            if (selectedOption) {
+              const correctAnswer = getCorrectAnswer(actualQuestionNum);
+              const feedback = currentQuestion.querySelector(".feedback");
+              const button = currentQuestion.querySelector(".check-btn");
+              const options = currentQuestion.querySelectorAll(".option");
+
+              // Disable the button and radio buttons
+              button.disabled = true;
+              currentQuestion
+                .querySelectorAll(`input[name="q${actualQuestionNum}"]`)
+                .forEach((input) => {
+                  input.disabled = true;
+                });
+
+              const selectedValue = selectedOption.value;
+              const selectedOption_div = selectedOption.closest(".option");
+
+              if (selectedValue === correctAnswer) {
+                selectedOption_div.classList.add("selected-correct");
+                feedback.className = "feedback correct show";
+                feedback.innerHTML = `✅ <strong>Correct!</strong>`;
+              } else {
+                selectedOption_div.classList.add("selected-incorrect");
+                const correctOption = currentQuestion
+                  .querySelector(
+                    `input[name="q${actualQuestionNum}"][value="${correctAnswer}"]`
+                  )
+                  .closest(".option");
+                correctOption.classList.add("show-correct");
+                feedback.className = "feedback incorrect show";
+                feedback.innerHTML = `❌ <strong>Incorrect.</strong>`;
+              }
+            }
+          }
         }
 
         // Update question counter
@@ -3513,15 +3574,29 @@
 
         prevBtn.disabled = questionNum === 1;
 
-        // Disable next button unless question is answered
+        // Fix next button logic - check if current question is answered
         const isAnswered = answeredQuestions.has(actualQuestionNum);
-        nextBtn.disabled = !isAnswered && questionNum < totalQuestions;
+
+        // Debug logging for troubleshooting
+        console.log(
+          `Question ${questionNum}, ActualQuestionNum: ${actualQuestionNum}, IsAnswered: ${isAnswered}, AnsweredQuestions:`,
+          Array.from(answeredQuestions)
+        );
 
         if (questionNum === totalQuestions) {
           nextBtn.textContent = "Finish";
-          nextBtn.disabled = !isAnswered;
+          nextBtn.disabled = false; // Allow finishing even if last question not answered
         } else {
           nextBtn.textContent = "Next";
+          // More lenient approach - if question has any answer selected, enable next
+          const hasSelectedAnswer = document.querySelector(
+            `input[name="q${actualQuestionNum}"]:checked`
+          );
+          const questionAnswered = isAnswered || hasSelectedAnswer;
+          nextBtn.disabled = !questionAnswered;
+          console.log(
+            `Next button disabled: ${!questionAnswered}, hasSelectedAnswer: ${!!hasSelectedAnswer}`
+          );
         }
       }
 
@@ -3574,24 +3649,33 @@
           // Reset progress
           answeredQuestions.clear();
           updateProgress();
-          // Re-enable all buttons and clear feedback
-          document
-            .querySelectorAll(".check-btn")
-            .forEach((btn) => (btn.disabled = false));
-          document.querySelectorAll('input[type="radio"]').forEach((input) => {
-            input.disabled = false;
-            input.checked = false;
-          });
-          document.querySelectorAll(".feedback").forEach((feedback) => {
-            feedback.classList.remove("show");
-          });
-          document.querySelectorAll(".option").forEach((option) => {
-            option.classList.remove(
-              "selected-correct",
-              "selected-incorrect",
-              "show-correct"
-            );
-          });
+
+          // Get current chapter section to clear states properly
+          const chapterSection = document.getElementById(
+            `chapter${currentChapter}`
+          );
+          if (chapterSection) {
+            // Re-enable all buttons and clear feedback for current chapter
+            chapterSection
+              .querySelectorAll(".check-btn")
+              .forEach((btn) => (btn.disabled = false));
+            chapterSection
+              .querySelectorAll('input[type="radio"]')
+              .forEach((input) => {
+                input.disabled = false;
+                input.checked = false;
+              });
+            chapterSection.querySelectorAll(".feedback").forEach((feedback) => {
+              feedback.classList.remove("show", "correct", "incorrect");
+            });
+            chapterSection.querySelectorAll(".option").forEach((option) => {
+              option.classList.remove(
+                "selected-correct",
+                "selected-incorrect",
+                "show-correct"
+              );
+            });
+          }
         }
 
         // Shuffle the question order
@@ -3608,7 +3692,11 @@
         showQuestion(1);
 
         // Update shuffle button text
-        document.getElementById("shuffle-btn").textContent = "🔀 Shuffle Again";
+        const suffix = currentChapter === 5 ? "" : `-${currentChapter}`;
+        const shuffleBtn = document.getElementById(`shuffle-btn${suffix}`);
+        if (shuffleBtn) {
+          shuffleBtn.textContent = "🔀 Shuffle Again";
+        }
       }
 
       function getCorrectAnswer(questionNum) {
@@ -3670,7 +3758,7 @@
           55: "b",
           56: "b",
           57: "b",
-          58: "b",
+          58: "c",
           59: "a",
           60: "c",
           61: "a",
@@ -3711,15 +3799,14 @@
         const selectedOption = document.querySelector(
           `input[name="q${questionNum}"]:checked`
         );
-        const feedback = document.querySelector(
-          `.quiz-item:nth-child(${questionNum + 1}) .feedback`
-        );
-        const button = document.querySelector(
-          `.quiz-item:nth-child(${questionNum + 1}) .check-btn`
-        );
-        const options = document.querySelectorAll(
-          `.quiz-item:nth-child(${questionNum + 1}) .option`
-        );
+
+        // Find the current active question instead of using questionNum + 1
+        const activeQuestion = document.querySelector(".quiz-item.active");
+        if (!activeQuestion) return;
+
+        const feedback = activeQuestion.querySelector(".feedback");
+        const button = activeQuestion.querySelector(".check-btn");
+        const options = activeQuestion.querySelectorAll(".option");
 
         if (!selectedOption) {
           alert("Please select an answer before checking!");
@@ -3756,7 +3843,7 @@
           selectedOption_div.classList.add("selected-incorrect");
 
           // Show the correct answer
-          const correctOption = document
+          const correctOption = activeQuestion
             .querySelector(
               `input[name="q${questionNum}"][value="${correctAnswer}"]`
             )
@@ -3771,13 +3858,20 @@
         if (!answeredQuestions.has(questionNum)) {
           answeredQuestions.add(questionNum);
           updateProgress();
+          console.log(
+            `Added question ${questionNum} to answeredQuestions. Current set:`,
+            Array.from(answeredQuestions)
+          );
         }
 
-        // Enable next button after answering
+        // Enable next button after answering - always enable after any answer
         if (currentChapter) {
           const suffix = currentChapter === 5 ? "" : `-${currentChapter}`;
           const nextBtn = document.getElementById(`next-btn${suffix}`);
-          if (nextBtn) nextBtn.disabled = false;
+          if (nextBtn) {
+            nextBtn.disabled = false;
+            console.log(`Enabled next button for question ${questionNum}`);
+          }
         }
       }
 
